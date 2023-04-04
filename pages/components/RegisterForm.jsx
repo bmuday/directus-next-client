@@ -3,14 +3,15 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import useRegister from "@/hooks/useRegister";
 import Link from "next/link";
+import { useUserStore } from "@/stores";
 
 const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,6 @@ const RegisterForm = () => {
     const { userData, error } = await useRegister({ email, password });
 
     if (userData) {
-      console.log("userData1");
       setUser(userData);
       setSuccess("Utilisateur créé!");
       setTimeout(() => {
@@ -70,7 +70,7 @@ const RegisterForm = () => {
             Register
           </button>
         </div>
-        {user && <p>{success}</p>}
+        {success && <p>{success}</p>}
         {error && <p>{error}</p>}
       </form>
       <button className="w-full py-3 font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow">

@@ -3,14 +3,15 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import useLogin from "@/hooks/useLogin";
+import { useUserStore } from "@/stores";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,10 +27,11 @@ const LoginForm = () => {
       }, 2000);
     }
     if (error) {
-      setError(error.message);
-      setTimeout(() => {
-        setError("");
-      }, 2000);
+      if (error.message.includes("Invalid")) {
+        setError("Wrong username or password.");
+      } else {
+        setError(error.message);
+      }
     }
   };
 
@@ -41,6 +43,7 @@ const LoginForm = () => {
             <label className="font-bold text-slate-700">Email</label>
             <input
               type="text"
+              name="email"
               className="w-full py-3 mt-1 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -51,6 +54,7 @@ const LoginForm = () => {
             <label className="font-bold text-slate-700">Password</label>
             <input
               type="password"
+              name="password"
               className="w-full py-3 mt-1 border border-slate-200 rounded-lg px-3 focus:outline-none focus:border-slate-500 hover:shadow"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -64,8 +68,8 @@ const LoginForm = () => {
             Login
           </button>
         </div>
-        {user && <p>{success}</p>}
-        {error && <p>{error.message}</p>}
+        {success && <p>{success}</p>}
+        {error && <p>{error}</p>}
       </form>
       <button className="w-full py-3 font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg border-indigo-500 hover:shadow">
         <Link href="/register">Register</Link>
